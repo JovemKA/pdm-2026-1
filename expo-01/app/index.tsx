@@ -1,5 +1,5 @@
-import { Text, View } from "react-native";
 import { Link } from "expo-router";
+import { Text, View } from "react-native";
 
 export default function Index() {
   return (
@@ -15,6 +15,7 @@ export default function Index() {
       <View style={{ width: 100, backgroundColor: "red", flex: 0.4 }} />
       <Link href="/about">About</Link>
       <Link href="/tarefas">Tarefas</Link>
+      <Link href="/animacao">Animação</Link>
     </View>
   );
 }
