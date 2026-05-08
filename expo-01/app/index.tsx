@@ -16,6 +16,7 @@ export default function Index() {
       <Link href="/about">About</Link>
       <Link href="/tarefas">Tarefas</Link>
       <Link href="/animacao">Animação</Link>
+      <Link href="/gostoNaoGosto">Gosto / Não Gosto</Link>
     </View>
   );
 }
