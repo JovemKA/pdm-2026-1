@@ -1,17 +1,24 @@
+import { adicionarTarefa, getTarefas } from "@/back4app";
+import { useTaskFilter } from "@/zustand";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Button,
+  Pressable,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   View,
 } from "react-native";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { adicionarTarefa, getTarefas } from "@/back4app";
 
 export default function TarefasPage() {
+  const isEnabled = useTaskFilter((state) => state.isEnabled);
+  const toggleSwitch = useTaskFilter((state) => state.toggleSwitch);
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { data, isFetching } = useQuery({
     queryKey: ["tarefas"],
@@ -24,6 +31,7 @@ export default function TarefasPage() {
     },
   });
   const [descricao, setDescricao] = useState("");
+  const tasks = isEnabled ? data?.filter((t) => !t.concluida) : data;
 
   async function handleAdicionarTarefaPress() {
     if (descricao.trim() === "") {
@@ -51,14 +59,27 @@ export default function TarefasPage() {
         disabled={mutation.isPending}
       />
       <View style={styles.hr} />
+      <View style={styles.switchContainer}>
+        <Text>Filtrar as concluídas: </Text>
+        <Switch
+          trackColor={{ false: "#767577", true: "#81b0ff" }}
+          thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={toggleSwitch}
+          value={isEnabled}
+        />
+      </View>
+      <View style={styles.hr} />
       <View style={styles.tasksContainer}>
-        {data?.map((t) => (
-          <Text
+        {tasks?.map((t) => (
+          <Pressable
             key={t.objectId}
-            style={t.concluida && styles.strikethroughText}
+            onPress={() => router.push(`/tarefas/${t.objectId}`)}
           >
-            {t.descricao}
-          </Text>
+            <Text style={t.concluida && styles.strikethroughText}>
+              {t.descricao}
+            </Text>
+          </Pressable>
         ))}
       </View>
     </View>
@@ -91,5 +112,13 @@ const styles = StyleSheet.create({
     textDecorationStyle: "solid", // Optional: Style of the line
     textDecorationColor: "red", // Optional: Color of the line (iOS only)
     // Other styles like fontSize, fontWeight, color can also be applied
+  },
+  switchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 10,
+    width: "100%",
+    paddingHorizontal: 10,
   },
 });
